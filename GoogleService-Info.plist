@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAGxXOZN1gJuHEAXuvbbCkeaIhsNp7IF2E</string>
+	<key>GCM_SENDER_ID</key>
+	<string>122058257840</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>salao-da-amanda.com</string>
+	<key>PROJECT_ID</key>
+	<string>salao-amanda</string>
+	<key>STORAGE_BUCKET</key>
+	<string>salao-amanda.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:122058257840:ios:20fe9188aecff97e5dd275</string>
+</dict>
+</plist>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "122058257840",
+    "project_id": "salao-amanda",
+    "storage_bucket": "salao-amanda.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122058257840:android:edf070dd9e963ebb5dd275",
+        "android_client_info": {
+          "package_name": "salao_da_amanda.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9WTAAoXgsWcMoSpThsvyUj3g1nmzCnEU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
