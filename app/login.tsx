@@ -1,11 +1,11 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { auth, db } from "@/config/firebase"; // Importar db para salvar o token
+import { auth, db } from "@/config/firebase";
 import Constants from "expo-constants";
-import * as Notifications from "expo-notifications"; // Importar Expo Notifications
+import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore"; // Importar funções do Firestore
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -27,7 +27,6 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // --- Função para buscar o Token de Notificação ---
   const registerForPushNotificationsAsync = async () => {
     let token;
     if (Platform.OS === 'android') {
@@ -61,28 +60,44 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
-      // 1. Realiza o login
+      // 1. Realiza o login no Auth
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2. Tenta capturar o token de notificação
-      const token = await registerForPushNotificationsAsync();
+      // 2. VERIFICAÇÃO DE ADMINISTRADOR NO FIRESTORE
+      const userDoc = await getDoc(doc(db, "users", user.uid));
 
-      // 3. Salva o token no Firestore do usuário
-      if (token) {
-        await updateDoc(doc(db, "users", user.uid), {
-          pushToken: token
+      if (!userDoc.exists() || userDoc.data()?.role !== 'admin') {
+        // Se não for admin, desloga na hora
+        await signOut(auth);
+        toast.error("Acesso Negado", {
+          description: "Esta área é restrita para administradores."
         });
+        setLoading(false);
+        return;
       }
 
-      toast.success("Seja bem-vindo(a) ao Salão Amanda", {
-        description: "Login realizado com sucesso."
+      // 3. Se for admin, tenta capturar o token de notificação
+      try {
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          await updateDoc(doc(db, "users", user.uid), {
+            pushToken: token
+          });
+        }
+      } catch (e) {
+        console.warn("Não foi possível obter o token de notificação push:", e);
+        toast.info("Login realizado", { description: "Não foi possível registrar as notificações."});
+      }
+
+      toast.success("Painel Administrativo", {
+        description: "Bem-vinda, Amanda!"
       });
 
       router.replace("/(tabs)");
     } catch (error: any) {
       console.error("Erro ao fazer login:", error.code);
-      let errorMessage = "Ocorreu um erro. Tente novamente.";
+      let errorMessage = "Ocorreu um erro ao tentar entrar.";
 
       if (error.code === 'auth/invalid-email') errorMessage = "E-mail inválido.";
       else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
@@ -109,8 +124,8 @@ export default function LoginScreen() {
             <ThemedText type="title" className="mb-2 text-3xl font-bold text-pink-600">
               Salão Amanda
             </ThemedText>
-            <ThemedText className="mb-8 text-gray-500">
-              Realce sua beleza conosco
+            <ThemedText className="mb-8 text-gray-500 uppercase tracking-widest text-[10px] font-bold">
+              Acesso Administrativo
             </ThemedText>
           </Animated.View>
 
@@ -152,7 +167,7 @@ export default function LoginScreen() {
                 {loading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text className="text-lg font-bold text-white">Entrar</Text>
+                  <Text className="text-lg font-bold text-white">Entrar no Painel</Text>
                 )}
               </TouchableOpacity>
             </Animated.View>

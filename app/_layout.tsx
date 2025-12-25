@@ -84,10 +84,8 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
           {/* Definimos as telas explicitamente para evitar erros de navegação */}
           <Stack.Screen name="login" />
-          <Stack.Screen name="register" />
           <Stack.Screen name="forgot-password" />
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="admin-setup" />
         </Stack>
 
         <Toaster position="top-center" />

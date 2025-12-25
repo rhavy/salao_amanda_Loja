@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:122058257840:android:f9e802953dbb03c75dd275",
+        "android_client_info": {
+          "package_name": "com.salaoamandaloja.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9WTAAoXgsWcMoSpThsvyUj3g1nmzCnEU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:122058257840:android:edf070dd9e963ebb5dd275",
         "android_client_info": {
           "package_name": "salao_da_amanda.com"

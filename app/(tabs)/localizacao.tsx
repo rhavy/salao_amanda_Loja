@@ -1,7 +1,9 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { db } from "@/config/firebase";
+import { auth, db } from "@/config/firebase"; // Importe o auth aqui
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router"; // Importe o router
+import { signOut } from "firebase/auth"; // Importe o signOut
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
@@ -29,6 +31,7 @@ const DAYS_OF_WEEK = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado
 const TIME_MASK = [/\d/, /\d/, ':', /\d/, /\d/];
 
 export default function AdminLocationScreen() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -55,6 +58,25 @@ export default function AdminLocationScreen() {
     return () => unsub();
   }, []);
 
+  // --- FUNÇÃO PARA SAIR ---
+  const handleLogout = () => {
+    Alert.alert("Sair", "Deseja realmente encerrar sua sessão?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Sair",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await signOut(auth);
+            router.replace("/login"); // Certifique-se que o caminho do seu login está correto
+          } catch (error) {
+            toast.error("Erro ao sair.");
+          }
+        }
+      },
+    ]);
+  };
+
   const addHourRow = () => {
     if (businessHours.length >= DAYS_OF_WEEK.length) return;
     setBusinessHours([...businessHours, { day: "Segunda", open: "09:00", close: "18:00" }]);
@@ -66,7 +88,6 @@ export default function AdminLocationScreen() {
     setBusinessHours(newHours);
   };
 
-  // Metodo de Salvamento Otimizado com Alerta de Confirmação
   const handleConfirmSave = () => {
     if (!street || !whatsapp || !city) {
       toast.error("Preencha os campos obrigatórios!");
@@ -98,9 +119,9 @@ export default function AdminLocationScreen() {
       };
 
       await setDoc(doc(db, "settings", "salon_info"), salonData, { merge: true });
-      toast.success("Dados publicados com sucesso!");
+      toast.success("Dados publicados!");
     } catch (e) {
-      toast.error("Erro técnico ao salvar dados.");
+      toast.error("Erro técnico ao salvar.");
     } finally {
       setIsSaving(false);
     }
@@ -113,9 +134,19 @@ export default function AdminLocationScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
         <ScrollView contentContainerStyle={{ paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
 
-          <Animated.View entering={FadeInDown} className="bg-pink-500 p-8 pt-16 rounded-b-[45px] shadow-xl mb-8">
-            <ThemedText className="text-white opacity-80 mb-1 font-medium uppercase text-[10px] tracking-widest">Painel Amanda</ThemedText>
-            <ThemedText className="text-3xl font-bold text-white">Dados do Salão</ThemedText>
+          <Animated.View entering={FadeInDown} className="bg-pink-500 p-8 pt-16 rounded-b-[45px] shadow-xl mb-8 flex-row justify-between items-center">
+            <View>
+              <ThemedText className="text-white opacity-80 mb-1 font-medium uppercase text-[10px] tracking-widest">Painel Amanda</ThemedText>
+              <ThemedText className="text-3xl font-bold text-white">Dados do Salão</ThemedText>
+            </View>
+
+            {/* BOTÃO SAIR NO TOPO */}
+            <TouchableOpacity
+              onPress={handleLogout}
+              className="bg-white/20 p-3 rounded-2xl border border-white/20"
+            >
+              <Ionicons name="log-out-outline" size={24} color="white" />
+            </TouchableOpacity>
           </Animated.View>
 
           <View className="px-6">
@@ -123,14 +154,11 @@ export default function AdminLocationScreen() {
             {/* Seção Endereço */}
             <View className="bg-white p-6 rounded-[35px] shadow-sm border border-gray-100 mb-6">
               <Text className="text-gray-400 font-bold text-[10px] uppercase mb-4 tracking-widest">Localização</Text>
-
               <TextInput placeholder="Rua/Av" className="bg-gray-50 p-4 rounded-2xl mb-3 border border-gray-100 font-medium" value={street} onChangeText={setStreet} />
-
               <View className="flex-row mb-3">
                 <TextInput placeholder="Nº" keyboardType="numeric" className="flex-1 bg-gray-50 p-4 rounded-2xl mr-2 border border-gray-100 font-medium" value={number} onChangeText={setNumber} />
                 <TextInput placeholder="Bairro" className="flex-[2] bg-gray-50 p-4 rounded-2xl border border-gray-100 font-medium" value={neighborhood} onChangeText={setNeighborhood} />
               </View>
-
               <TextInput placeholder="Cidade - UF" className="bg-gray-50 p-4 rounded-2xl border border-gray-100 font-medium" value={city} onChangeText={setCity} />
             </View>
 
@@ -147,7 +175,7 @@ export default function AdminLocationScreen() {
               />
             </View>
 
-            {/* Seção Horários Estruturados */}
+            {/* Seção Horários */}
             <View className="bg-white p-6 rounded-[35px] shadow-sm border border-gray-100 mb-8">
               <View className="flex-row justify-between items-center mb-6">
                 <Text className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Horários</Text>
